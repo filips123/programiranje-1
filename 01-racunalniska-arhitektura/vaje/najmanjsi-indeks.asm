@@ -26,9 +26,9 @@ poisci_minimum:
 	MOV D, 255
 
 zanka_funkcije:
+	INC A
 	CMP A, C
 	JAE konec_funkcije
-	INC A
 	CMP D, [A]
 	JB zanka_funkcije
 	MOV B, A
