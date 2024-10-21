@@ -209,7 +209,13 @@ let rec fold_left_no_acc f =
  - : int list = []
 [*----------------------------------------------------------------------------*)
 
-let rec apply_sequence = ()
+let rec apply_sequence f x n =
+  let rec aux acc y =
+    function
+    | m when m < 0 -> acc
+    | m -> aux (acc @ [y]) (f y) (m - 1)
+  in
+  aux [] x n
 
 (*----------------------------------------------------------------------------*]
  Funkcija [filter f list] vrne seznam elementov [list], pri katerih funkcija [f]
@@ -220,7 +226,13 @@ let rec apply_sequence = ()
  - : int list = [4; 5]
 [*----------------------------------------------------------------------------*)
 
-let rec filter = ()
+let rec filter f =
+  let rec aux acc =
+    function
+    | [] -> acc
+    | x :: xs -> if f x then aux (acc @ [x]) xs else aux acc xs
+  in
+  aux []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [exists] sprejme seznam in funkcijo, ter vrne vrednost [true] čim
@@ -234,7 +246,10 @@ let rec filter = ()
  - : bool = false
 [*----------------------------------------------------------------------------*)
 
-let rec exists = ()
+let rec exists f =
+  function
+  | [] -> false
+  | x :: xs -> if f x then true else exists f xs
 
 (*----------------------------------------------------------------------------*]
  Funkcija [first f default list] vrne prvi element seznama, za katerega
@@ -248,4 +263,7 @@ let rec exists = ()
  - : int = 0
 [*----------------------------------------------------------------------------*)
 
-let rec first = ()
+let rec first f default =
+  function
+  | [] -> default
+  | x :: xs -> if f x then x else first f default xs
