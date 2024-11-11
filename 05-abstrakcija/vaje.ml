@@ -18,11 +18,16 @@
 module type NAT = sig
   type t
 
-  val eq  : t -> t -> bool
+  val eq : t -> t -> bool
   val zero : t
-  (* Dodajte manjkajoče! *)
-  (* val to_int : t -> int *)
-  (* val of_int : int -> t *)
+  val one : t
+
+  val ( +++ ) : t -> t -> t
+  val ( --- ) : t -> t -> t
+  val ( *** ) : t -> t -> t
+
+  val to_int : t -> int
+  val of_int : int -> t
 end
 
 (*----------------------------------------------------------------------------*
@@ -34,12 +39,19 @@ end
 [*----------------------------------------------------------------------------*)
 
 module Nat_int : NAT = struct
-
   type t = int
-  let eq x y = failwith "later"
-  let zero = 0
-  (* Dodajte manjkajoče! *)
 
+  let eq x y = x = y
+
+  let zero = 0
+  let one = 1
+
+  let ( +++ ) x y = x + y
+  let ( --- ) x y = x - y
+  let ( *** ) x y = x * y
+
+  let to_int x = x
+  let of_int x = x
 end
 
 (*----------------------------------------------------------------------------*
@@ -52,12 +64,47 @@ end
 [*----------------------------------------------------------------------------*)
 
 module Nat_peano : NAT = struct
+  type t =
+  | Zero
+  | Succ of t
 
-  type t = unit (* To morate spremeniti! *)
-  let eq x y = failwith "later"
-  let zero = () (* To morate spremeniti! *)
-  (* Dodajte manjkajoče! *)
+  let rec eq x y = match x, y with
+  | Zero, Zero -> true
+  | Succ _, Zero -> false
+  | Zero, Succ _ -> false
+  | Succ x', Succ y' -> eq x' y'
 
+  let zero = Zero
+  let one = Succ Zero
+
+  let ( +++ ) x y =
+    let rec aux acc = function
+    | Zero -> acc
+    | Succ y' -> aux (Succ acc) y'
+   in aux x y
+
+  let rec ( --- ) x y = match x, y with
+  | Succ x', Succ y' -> x' --- y'
+  | Zero, _ -> Zero
+  | _, Zero -> x
+
+  let ( *** ) x y =
+    let rec aux acc = function
+    | Zero -> acc
+    | Succ y' -> aux (acc +++ x) y'
+    in aux Zero y
+
+  let to_int x =
+    let rec aux acc = function
+    | Zero -> acc
+    | Succ x' -> aux (acc + 1) x'
+    in aux 0 x
+
+  let of_int x =
+    let rec aux acc = function
+    | x when x <= 0 -> acc
+    | x -> aux (Succ acc) (x - 1)
+  in aux Zero x
 end
 
 (*----------------------------------------------------------------------------*
@@ -79,8 +126,15 @@ end
 let sum_nat_100 = 
   (* let module Nat = Nat_int in *)
   let module Nat = Nat_peano in
-  Nat.zero (* to popravite na ustrezen izračun *)
-  (* |> Nat.to_int *)
+
+  let rec aux acc = function
+  | n when Nat.eq Nat.zero n -> acc
+  | n -> aux (Nat.(+++) acc n) (Nat.(---) n Nat.one)
+  in
+
+  aux (Nat.zero) (Nat.of_int 100)
+  |> Nat.to_int
+
 (* val sum_nat_100 : int = 5050 *)
 
 (*----------------------------------------------------------------------------*
