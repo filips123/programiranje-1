@@ -16,6 +16,7 @@
 [*----------------------------------------------------------------------------*)
 
 module type NAT = sig
+
   type t
 
   val eq : t -> t -> bool
@@ -28,6 +29,7 @@ module type NAT = sig
 
   val to_int : t -> int
   val of_int : int -> t
+
 end
 
 (*----------------------------------------------------------------------------*
@@ -39,6 +41,7 @@ end
 [*----------------------------------------------------------------------------*)
 
 module Nat_int : NAT = struct
+
   type t = int
 
   let eq x y = x = y
@@ -52,6 +55,7 @@ module Nat_int : NAT = struct
 
   let to_int x = x
   let of_int x = x
+
 end
 
 (*----------------------------------------------------------------------------*
@@ -64,6 +68,7 @@ end
 [*----------------------------------------------------------------------------*)
 
 module Nat_peano : NAT = struct
+
   type t =
   | Zero
   | Succ of t
@@ -105,6 +110,7 @@ module Nat_peano : NAT = struct
     | x when x <= 0 -> acc
     | x -> aux (Succ acc) (x - 1)
   in aux Zero x
+
 end
 
 (*----------------------------------------------------------------------------*
@@ -187,9 +193,18 @@ let sum_nat_100 =
 [*----------------------------------------------------------------------------*)
 
 module type COMPLEX = sig
+
   type t
+
   val eq : t -> t -> bool
-  (* Dodajte manjkajoče! *)
+
+  val zero : t
+  val one : t
+  val i : t
+
+  val neg : t -> t
+  val conj : t -> t
+
 end
 
 (*----------------------------------------------------------------------------*
@@ -201,8 +216,14 @@ module Cartesian : COMPLEX = struct
 
   type t = {re : float; im : float}
 
-  let eq x y = failwith "later"
-  (* Dodajte manjkajoče! *)
+  let eq x y = x.re = y.re && x.im = y.im
+
+  let zero = { re = 0.; im = 0. }
+  let one = { re = 1.; im = 0. }
+  let i = { re = 0.; im = 1. }
+
+  let neg x = { re = -. x.re; im = -. x.im }
+  let conj x = { re = x.re; im = -. x.im }
 
 end
 
@@ -222,7 +243,18 @@ module Polar : COMPLEX = struct
   let rad_of_deg deg = (deg /. 180.) *. pi
   let deg_of_rad rad = (rad /. pi) *. 180.
 
-  let eq x y = failwith "later"
-  (* Dodajte manjkajoče! *)
+  let rec normalize = function
+  | arg when arg >= 2. *. pi -> normalize (arg -. 2. *. pi)
+  | arg when arg < 0. -> normalize (arg +. 2. *. pi)
+  | arg -> arg
+
+  let eq x y = x.magn = y.magn && (normalize x.arg) = (normalize y.arg)
+
+  let zero = {magn = 0.; arg = 0.}
+  let one = {magn = 1.; arg = 0.}
+  let i = {magn = 1.; arg = pi /. 2.}
+
+  let neg x = { magn = x.magn; arg = normalize (x.arg +. pi) }
+  let conj x = { magn = x.magn; arg = normalize (-. x.arg) }
 
 end
