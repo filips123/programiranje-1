@@ -205,6 +205,11 @@ module type COMPLEX = sig
   val neg : t -> t
   val conj : t -> t
 
+  val ( +++ ) : t -> t -> t
+  val ( *** ) : t -> t -> t
+
+  val to_string : t -> string
+
 end
 
 (*----------------------------------------------------------------------------*
@@ -224,6 +229,12 @@ module Cartesian : COMPLEX = struct
 
   let neg x = { re = -. x.re; im = -. x.im }
   let conj x = { re = x.re; im = -. x.im }
+
+  let ( +++ ) x y = { re = x.re +. y.re; im = x.im +. y.im }
+
+  let ( *** ) x y = { re = x.re *. y.re -. x.im *. y.im; im = x.re *. y.im +. x.im *. y.re }
+
+  let to_string x = Printf.sprintf "%f + %f i" x.re x.im
 
 end
 
@@ -256,5 +267,14 @@ module Polar : COMPLEX = struct
 
   let neg x = { magn = x.magn; arg = normalize (x.arg +. pi) }
   let conj x = { magn = x.magn; arg = normalize (-. x.arg) }
+
+  let ( +++ ) x y =
+    let re = x.magn *. cos x.arg +. y.magn *. cos y.arg in
+    let im = x.magn *. sin x.arg +. y.magn *. sin y.arg in
+    { magn = sqrt (re *. re +. im *. im); arg = normalize (atan2 im re) }
+
+  let ( *** ) x y = { magn = x.magn *. y.magn; arg = normalize (x.arg +. y.arg) }
+
+  let to_string x = Printf.sprintf "%f * e ^ (%f i)" x.magn x.arg
 
 end
