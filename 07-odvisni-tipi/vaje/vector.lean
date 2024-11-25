@@ -1,5 +1,7 @@
--- Vzamemo stvari iz predavanj
 set_option autoImplicit false
+
+
+-- Naravna števila
 
 inductive Naravno : Type where
   | nic : Naravno
@@ -14,6 +16,7 @@ def plus : Naravno → Naravno → Naravno :=
     | Naravno.naslednik m' =>
         Naravno.naslednik (plus m' n)
 
+
 -- Vektorji
 
 inductive Vektor : Type → Naravno → Type where
@@ -23,6 +26,7 @@ deriving Repr
 
 #check (Vektor.sestavljen "a" (Vektor.sestavljen "b" (Vektor.prazen)))
 
+
 def stakni_vektorja : {A : Type} → {m n : Naravno} → Vektor A m → Vektor A n → Vektor A (plus m n) :=
   fun {A : Type} {m n : Naravno} (xs : Vektor A m) (ys : Vektor A n) =>
     match xs with
@@ -30,22 +34,36 @@ def stakni_vektorja : {A : Type} → {m n : Naravno} → Vektor A m → Vektor A
     | Vektor.sestavljen x xs' => Vektor.sestavljen x (stakni_vektorja xs' ys)
 
 
--- Sedaj lahko definiramo `lookup`, ki ne bo nikoli povzročil napake.
+-- Sedaj lahko definiramo `lookup`, ki ne bo nikoli povzročil napake
+
 inductive Finite : Naravno -> Type where
   | fzero : {n : Naravno} -> Finite (Naravno.naslednik n)
   | fsucc : {n : Naravno} -> Finite n -> Finite (Naravno.naslednik n)
 
 
 def lookup {A : Type} {n : Naravno} : Vektor A n -> Finite n -> A :=
-  sorry
+  fun xs i =>
+    match xs, i with
+    | Vektor.sestavljen y ys, Finite.fzero => y
+    | Vektor.sestavljen _ ys, Finite.fsucc j => lookup ys j
 
 
 -- Včasih enakost tipov ni takoj očitna in jo moramo izpeljati
--- Dopolnite naslednjo definicijo, vse potrebne leme pa dokažite kar s taktiko `sorry`.
+-- Dopolnite naslednjo definicijo, vse potrebne leme pa dokažite kar s taktiko `sorry`
+
+def add_comm : (m n : Naravno) -> plus m n = plus n m :=
+  sorry
+
 
 def stakni_vektorja' : {A : Type} → {m n : Naravno} → Vektor A m → Vektor A n → Vektor A (plus n m) :=
   sorry
 
--- Uporabite samo definicijo `stakni_vektorja'` in taktike `rw` in `exact`.
+
+-- Uporabite samo definicijo `stakni_vektorja'` in taktike `rw` in `exact`
+
 def stakni_vektorja'' : {A : Type} → {m n : Naravno} → Vektor A m → Vektor A n → Vektor A (plus m n) :=
-  sorry
+  by
+    intro A m n xs ys
+    have xx := stakni_vektorja' xs ys
+    rw [add_comm]
+    exact xx
