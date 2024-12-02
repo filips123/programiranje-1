@@ -6,17 +6,18 @@ def concat {A : Type} : List A → List A → List A :=
 
 #check (concat ["a", "b"] ["c", "d"])
 
+
 def reverse {A : Type} : List A → List A :=
   sorry
 
-
 #check (reverse ["a", "b", "c", "d"])
+
 
 def length {A : Type} : List A → Nat :=
   sorry
 
-
 #check (length ["a", "b", "c", "d"])
+
 
 theorem trd1  {A : Type} {x : A} : reverse [x] = [x] :=
   sorry
@@ -24,7 +25,6 @@ theorem trd1  {A : Type} {x : A} : reverse [x] = [x] :=
 theorem trd2 {A : Type} {xs ys : List A} : length (concat xs ys) = length xs + length ys :=
   sorry
 
--- Tega poznamo že iz predavanj
 theorem trd3 {A : Type} {xs : List A} : concat xs [] = xs :=
   by
     induction xs with
@@ -59,15 +59,16 @@ theorem map_id {A : Type} {xs : List A} : map id xs = xs :=
 theorem map_concat {A B : Type} {f : A → B} {xs ys : List A} : map f (concat xs ys) = concat (map f xs) (map f ys) :=
   sorry
 
-
 theorem map_reverse {A B : Type} {f : A → B} {xs : List A} : map f (reverse xs) = reverse (map f xs) :=
   sorry
+
 
 inductive tree (A : Type) : Type where
   | empty : tree A
   | node : A → tree A → tree A → tree A
 
 #check tree.rec
+
 
 def tree_map {A B : Type} : (A → B) → tree A → tree B :=
   sorry
@@ -106,10 +107,8 @@ def collect {A : Type} : tree A → List A :=
 theorem trd8 {A : Type} {x : A} {xs ys : List A} : concat xs (x::ys) = concat (concat xs [x]) ys :=
   sorry
 
-
 theorem collect_mirror {A : Type} {t : tree A} : collect (mirror t) = reverse (collect t) :=
   sorry
-
 
 def size {A : Type} : tree A → Nat :=
   sorry
