@@ -18,6 +18,11 @@ Natančno definirajte pogoje, da funkcija `f` uredi seznam.
  - : int list = [7]
 [*----------------------------------------------------------------------------*)
 
+let rec insert y =
+  function
+  | [] -> y :: []
+  | x :: xs when x > y -> y :: x :: xs
+  | x :: xs -> x :: (insert y xs)
 
 (*----------------------------------------------------------------------------*]
  Prazen seznam je že urejen. Funkcija [insert_sort] uredi seznam tako da
